@@ -59,10 +59,13 @@ def ntp_adjtime():
 
     return p_timex.contents
 
+unsync = False
 output = subprocess.Popen("chronyc tracking", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 if "not found" in output.stderr.read().decode():
     print("chrony not installed")
 else:
+    if "506 Cannot talk to daemon" in output.stdout.read().decode():
+        unsync = True
     output = output.stdout.read()
     print("chrony installed")
     adjtime = ntp_adjtime()
@@ -80,9 +83,7 @@ else:
     result = {
         "time": time_here.strftime("%Y-%m-%dT%H:%M:%S.%f") + offset,
         "synchronized": system_synchronized,
-        "source": "chrony"
     }
-
     if system_synchronized:
         
         # chrony implementation
@@ -97,7 +98,11 @@ else:
             if "Last offset" in parameter:
                 offset_str = parameter
         
-        try:        
+        try:
+            if unsync == False:
+                result["source"] = "chrony"
+            else:
+                raise Exception("Chrony not running")        
             reference = reference_str[reference_str.find('('):reference_str.find(')')]
             if reference != "":
                 result["reference"] = reference[1:]
