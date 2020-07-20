@@ -99,10 +99,22 @@ if output != None:
             result["reference"] = server
         except AttributeError:
             print("error")
-      
-        #except Exception as ex:
-            #result["synchronized"] = False
-            #result["error"] = str(ex)
+        
+        reference = reference_str[reference_str.find('('):reference_str.find(')')]
+        if reference != "":
+            result["reference"] = reference[1:]
+        else:
+            raise Exception("Reference server not found")
+        
+        offset = offset_str[offset_str.find(':'):]
+        if offset != "":
+            result["offset"] = offset[2:]
+        else:
+            raise Exception("Offset not found")
+ 
+        except Exception as ex:
+            result["synchronized"] = False
+            result["error"] = str(ex)
     print(result)
 
 else:
