@@ -59,9 +59,11 @@ def ntp_adjtime():
 
     return p_timex.contents
 
-output = subprocess.Popen("chronyc tracking", stdout=subprocess.PIPE, shell=True)
-output = output.stdout.read()
-if output != None:
+output = subprocess.Popen("chronyc tracking", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+if "not found" in output.stderr.read().decode():
+    print("chrony not installed")
+else:
+    output = output.stdout.read()
     print("chrony installed")
     adjtime = ntp_adjtime()
     system_synchronized = adjtime.synchronized
@@ -112,7 +114,4 @@ if output != None:
             result["synchronized"] = False
             result["error"] = str(ex)
     print(result)
-
-else:
-    print("chrony not installed")
 
