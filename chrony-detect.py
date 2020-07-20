@@ -80,8 +80,20 @@ if output != None:
     }
 
     if system_synchronized:
-        x = "placeholder"
+        
         # chrony implementation
+        
+        parameters = output.decode().split("\n")
+        
+        reference_str = ""
+        offset_str = ""
+        for parameter in parameters:
+            if "Reference" in parameter:
+                reference_str = parameter
+            if "Last offset" in parameter:
+                offset_str = parameter
+        print(reference_str)
+        print(offset_str)
         #except Exception as ex:
             #result["synchronized"] = False
             #result["error"] = str(ex)
