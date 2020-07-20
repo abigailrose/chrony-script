@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import re
 import datetime
 import pytz
 import tzlocal
@@ -76,7 +77,8 @@ if output != None:
 
     result = {
         "time": time_here.strftime("%Y-%m-%dT%H:%M:%S.%f") + offset,
-        "synchronized": system_synchronized
+        "synchronized": system_synchronized,
+        "source": "chrony"
     }
 
     if system_synchronized:
@@ -92,8 +94,12 @@ if output != None:
                 reference_str = parameter
             if "Last offset" in parameter:
                 offset_str = parameter
-        print(reference_str)
-        print(offset_str)
+        try: 
+            server = re.search('\((.+?)\)', reference_str).group(1)
+            result["reference"] = server
+        except AttributeError:
+            print("error")
+      
         #except Exception as ex:
             #result["synchronized"] = False
             #result["error"] = str(ex)
